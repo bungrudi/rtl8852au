@@ -4428,6 +4428,9 @@ struct mac_ax_mac_pwr_info {
 	u8 pwr_in_lps;
 	u32 (*intf_pwr_switch)(void *vadapter,
 			       u8 pre_switch, u8 on);
+	u32 lps_status[4];
+	u8 rpwm_seq_num;
+	u8 cpwm_seq_num;
 };
 
 /**
@@ -6269,6 +6272,23 @@ struct mac_ax_pg_efuse_info {
  * @var mac_ax_efuse_param::dav_log_efuse_map_valid
  * Please Place Description here.
  */
+struct mac_efuse_tbl {
+	mac_ax_mutex lock;
+};
+
+struct mac_bank_efuse_info {
+	/* efuse_param */
+	u8 **phy_map;
+	u8 **log_map;
+	u8 *phy_map_valid;
+	u8 *log_map_valid;
+	u32 *efuse_end;
+	/* hw_info */
+	u32 *phy_map_size;
+	u32 *log_map_size;
+	u32 *efuse_start;
+};
+
 struct mac_ax_efuse_param {
 	u8 *efuse_map;
 	u8 *bt_efuse_map;
@@ -6286,6 +6306,11 @@ struct mac_ax_efuse_param {
 	u32 dav_efuse_end;
 	u8 dav_efuse_map_valid;
 	u8 dav_log_efuse_map_valid;
+	struct mac_efuse_tbl efuse_tbl;
+	struct mac_bank_efuse_info bank_efuse_info;
+	u16 efuse_ctrl;
+	bool otp_test;
+	u8 dv_sel;
 };
 
 /*-------------------- Define offload related Struct -------------------------*/
@@ -13187,6 +13212,7 @@ struct mac_ax_adapter {
 #if MAC_AX_FEATURE_DBGDEC
 	struct mac_fw_msg *fw_log_array;
 #endif
+	struct mac_ax_ft_status ft_stat_arr[2];
 };
 
 /**

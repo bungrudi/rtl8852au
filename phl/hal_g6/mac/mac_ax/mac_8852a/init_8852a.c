@@ -654,6 +654,13 @@ struct mac_ax_adapter *get_mac_8852a_adapter(enum mac_ax_intf intf,
 	adapter->hw_info->cv = cv;
 	adapter->hw_info->intf = intf;
 	adapter->hw_info->done = 1;
+	pltfm_cb->rtl_memcpy(drv_adapter, adapter->ft_stat_arr, mac_8852a_ft_status,
+		     sizeof(adapter->ft_stat_arr));
+	adapter->ft_stat = adapter->ft_stat_arr;
+	pwr_info->rpwm_seq_num = 3;
+	pwr_info->cpwm_seq_num = 3;
+	adapter->efuse_param.efuse_ctrl = R_AX_EFUSE_CTRL;
+	adapter->efuse_param.dv_sel = DDV;
 
 	switch (intf) {
 #if MAC_AX_SDIO_SUPPORT

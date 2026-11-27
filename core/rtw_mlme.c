@@ -5433,6 +5433,11 @@ static enum phl_mdl_ret_code _connect_msg_hdlr(void* dispr, void* priv,
 	}
 
 	role = a->phl_role;
+	if (!role) {
+		RTW_ERR(FUNC_ADPT_FMT ": role == NULL (msg_id=0x%08x)\n",
+			FUNC_ADPT_ARG(a), msg->msg_id);
+		return MDL_RET_FAIL;
+	}
 	SET_MSG_MDL_ID_FIELD(nextmsg.msg_id, PHL_FG_MDL_CONNECT);
 	nextmsg.band_idx = role->hw_band;
 
@@ -5765,9 +5770,12 @@ void rtw_connect_abort(struct _ADAPTER *a)
 
 	cmd_req = &a->connect_req;
 	cmd_req->role = role;
-	status = rtw_phl_cancel_cmd_token(GET_PHL_INFO(d),
-					  role->hw_band,
-					  &a->connect_token);
+	if (role)
+		status = rtw_phl_cancel_cmd_token(GET_PHL_INFO(d),
+						  role->hw_band,
+						  &a->connect_token);
+	else
+		status = RTW_PHL_STATUS_FAILURE;
 	a->connect_token = 0;
 	if ((status != RTW_PHL_STATUS_SUCCESS)
 	    && (status != RTW_PHL_STATUS_PENDING)) {
@@ -5857,6 +5865,10 @@ enum rtw_phl_status rtw_connect_disconnect_prepare(struct _ADAPTER *a)
 	enum rtw_phl_status status;
 
 
+	if (!a->phl_role) {
+		RTW_ERR(FUNC_ADPT_FMT ": phl_role == NULL\n", FUNC_ADPT_ARG(a));
+		return RTW_PHL_STATUS_FAILURE;
+	}
 	SET_MSG_MDL_ID_FIELD(msg.msg_id, PHL_FG_MDL_CONNECT);
 	SET_MSG_EVT_ID_FIELD(msg.msg_id, MSG_EVT_DISCONNECT_PREPARE);
 	msg.band_idx = a->phl_role->hw_band;
