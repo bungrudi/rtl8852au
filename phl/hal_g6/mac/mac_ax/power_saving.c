@@ -42,9 +42,10 @@
 #define B_PS_LDM_32K_EN         BIT(31)
 #define B_PS_LDM_32K_EN_SH      31
 
-static u32 lps_status[4] = {0};
-static u8 rpwm_seq_num = RPWM_SEQ_NUM_MAX;
-static u8 cpwm_seq_num = CPWM_SEQ_NUM_MAX;
+/* Per-adapter LPS/RPWM/CPWM state to avoid cross-adapter interference */
+#define lps_status (adapter->mac_pwr_info.lps_status)
+#define rpwm_seq_num (adapter->mac_pwr_info.rpwm_seq_num)
+#define cpwm_seq_num (adapter->mac_pwr_info.cpwm_seq_num)
 
 static u32 send_h2c_lps_parm(struct mac_ax_adapter *adapter,
 			     struct lps_parm *parm)
@@ -263,7 +264,7 @@ static u32 set_req_pwr_state(struct mac_ax_adapter *adapter,
 	return MACSUCCESS;
 }
 
-static u32 _chk_cpwm_seq_num(u8 seq_num)
+static u32 _chk_cpwm_seq_num(struct mac_ax_adapter *adapter, u8 seq_num)
 {
 	u32 ret;
 
@@ -320,7 +321,7 @@ static u32 chk_cur_pwr_state(struct mac_ax_adapter *adapter,
 		return MACCPWMSEQERR;
 	}
 
-	if (_chk_cpwm_seq_num(GET_FIELD(cpwm, PS_CPWM_SEQ_NUM)) == MACCPWMSEQERR) {
+	if (_chk_cpwm_seq_num(adapter, GET_FIELD(cpwm, PS_CPWM_SEQ_NUM)) == MACCPWMSEQERR) {
 		PLTFM_MSG_TRACE("CPWM seq mismatch!!: expect val:%d, Rx val:%d\n",
 				cpwm_seq_num, GET_FIELD(cpwm, PS_CPWM_SEQ_NUM));
 		return MACCPWMSEQERR;

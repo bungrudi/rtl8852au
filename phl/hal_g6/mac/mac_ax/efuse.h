@@ -58,9 +58,7 @@
  * @var mac_efuse_tbl::lock
  * Please Place Description here.
  */
-struct mac_efuse_tbl {
-	mac_ax_mutex lock;
-};
+/* struct mac_efuse_tbl moved to mac_def.h for per-adapter storage */
 
 /**
  * @struct mac_efuse_hidden_h2creg
@@ -262,18 +260,7 @@ enum mac_checksum_offset {
  * @var mac_bank_efuse_info::log_map_size
  * Please Place Description here.
  */
-struct mac_bank_efuse_info {
-	/* efuse_param */
-	u8 **phy_map;
-	u8 **log_map;
-	u8 *phy_map_valid;
-	u8 *log_map_valid;
-	u32 *efuse_end;
-	/* hw_info */
-	u32 *phy_map_size;
-	u32 *log_map_size;
-	u32 *efuse_start;
-};
+/* struct mac_bank_efuse_info moved to mac_def.h for per-adapter storage */
 
 /**
  * @enum mac_defeature_offset

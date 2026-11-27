@@ -14,11 +14,12 @@
  ******************************************************************************/
 #include "efuse.h"
 
-static struct mac_efuse_tbl efuse_tbl;
-static struct mac_bank_efuse_info bank_efuse_info;
-u16 efuse_ctrl = R_AX_EFUSE_CTRL;
-bool OTP_test;
-enum rtw_dv_sel dv_sel = DDV;
+/* Per-adapter efuse state to avoid cross-adapter corruption on dual-NIC setups */
+#define efuse_tbl (adapter->efuse_param.efuse_tbl)
+#define bank_efuse_info (adapter->efuse_param.bank_efuse_info)
+#define efuse_ctrl (adapter->efuse_param.efuse_ctrl)
+#define OTP_test (adapter->efuse_param.otp_test)
+#define dv_sel (adapter->efuse_param.dv_sel)
 
 static u32 efuse_map_init(struct mac_ax_adapter *adapter,
 			  enum efuse_map_sel map_sel);
@@ -2135,6 +2136,9 @@ void cfg_efuse_auto_ck(struct mac_ax_adapter *adapter, u8 enable)
 u32 efuse_tbl_init(struct mac_ax_adapter *adapter)
 {
 	PLTFM_MUTEX_INIT(&efuse_tbl.lock);
+	efuse_ctrl = R_AX_EFUSE_CTRL;
+	OTP_test = 0;
+	dv_sel = DDV;
 
 	return MACSUCCESS;
 }
